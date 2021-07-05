@@ -1,0 +1,164 @@
+---
+title: "Exercícios dplyr e ggplot2 - MQuinho de inverno"
+author: "Rômulo Damasceno"
+date: "6/22/2021"
+output: 
+  html_document:
+    code_folding: hide
+    toc: true
+    toc_depth: 3
+---
+
+## Proposta
+
+Para esta lista de exercícios utilizaremos o banco de dados "gapminder", que possui informações demográficas sobre países e continentes, de 1952 a 2007. A ideia é que ao finalizar esta lista, você tenha uma série de objetos e informações interessantes que permitirão a criação do seu primeiro projeto de portfólio!
+
+## Passo 1 - Instalar e carregar os pacotes
+
+1.  Instale o pacote gapminder com a função install.packages()
+
+2.  Com a função library(), carregue os pacotes:
+
+    -   tidyverse
+
+    -   scales
+
+    -   gapminder
+
+3.  Atribua o banco de dados gapminder a um objeto de nome "bd_demog"
+
+```{r}
+# Resposta aqui
+
+#1 
+#install.packages('gapminder')
+
+#2
+library(gapminder)
+library(tidyverse)
+library(scales)
+
+#3 
+bd_demog <- gapminder
+```
+
+## Passo 2 - Estrutura do banco de dados
+
+1.  Utilize a função colnames(), head(), tail() e View() no banco de dados. Pense sobre o que cada uma delas faz.
+2.  Utilizando a função str(), analise a estrutura do banco de dados. As variáveis estão no formato correto?
+3.  Utilize a função summary() no banco de dados e reflita sobre quais das informações podem ser aproveitadas e quais precisam de maior aprofundamento. Faz sentido olhar para a expectativa de vida de todos os países ao mesmo tempo, por exemplo?
+
+```{r}
+#Respostas aqui
+
+```
+
+## Passo 3 - Filtragem de um continente para análise
+
+1.  Utilizando a função filter(), do dplyr, escolha um continente para aprofundar sua análise e salve num objeto separado.
+2.  Utilize a função summary() neste novo objeto. As estatísticas básicas mostradas fazem mais sentido agora?
+
+```{r}
+# Respostas aqui
+
+```
+
+## Passo 4 - Análise descritiva
+
+### 4.1. Média da expectativa de vida por país
+
+Qual é a média da expectativa de vida para cada país no período? Quais os três países que possuem a maior expectativa de vida? Quais três tem as menores? Salve o resultado num objeto separado chamado "seucontinente_lifeExp"
+
+**Dicas:**
+
+1.  Para responder à primeira questão, utilize a função group_by() para a coluna country e então utilize o summarise() com o argumento mean() para calcular as médias agrupadas.
+2.  Utilizando a função arrange(), reordene as expectativas de vida encontradas em ordem decrescente, para responder a segunda parte da questão.
+3.  Salve o resultado desse código num banco chamado "seucontinente_lifeExp"
+
+```{r}
+# Respostas aqui
+
+```
+
+### 4.2. Identificar os países com expectativas de vida inferiores e superiores a média dos países.
+
+Crie uma nova coluna no banco seucontinente_lifeExp com um identificador de países que estão acima ou abaixo da média da coluna media_lifeExp.
+
+**Dicas:**
+
+1.  Utilize a função mean() para identificar a média da coluna media_lifeExp
+2.  Utilize as funções mutate() e case_when(), para criar uma nova variável chamada **classificacao_lifeExp**, que tem dois níveis de resposta: "Abaixo da média" e "Acima da média".
+
+```{r}
+#Respostas aqui
+
+```
+
+## Passo 5 - Visualizações com o ggplot2
+
+### 5.1. Barras
+
+Utilize o vetor que contém as médias de expectativa de vida por país e crie um gráfico de barras.
+
+**Dicas:**
+
+1.  Como as expectativas de vida vão ficar no eixo Y e o geom_bar() não aceita a definição de um eixo Y, utilize o geom_col().
+
+```{r}
+#Respostas aqui
+
+```
+
+### 5.2. Histograma
+
+Utilize o vetor do seu continente para criar um histograma de todas as expectativas de vida neste continente.
+
+**Dicas:**
+
+1.  O geom utilizado é o geom_histogram()
+
+```{r}
+#Respostas aqui
+
+```
+
+### 5.3. Boxplot
+
+Escolha três países para comparar a variável de PIB per capita (gdpPercap) e crie um boxplot que contenha no eixo X os países, no eixo Y a variável gdpPercap e que as cores das caixinhas (fill) sejam pintadas de acordo com o país.
+
+**Dicas:**
+
+1.  O geom utilizado é o geom_boxplot()
+
+```{r}
+#Respostas aqui
+
+```
+
+### 5.4. Diagrama de dispersão
+
+Crie um gráfico de dispersão entre as variáveis de PIB per capita e expectativa de vida. As variáveis estão correlacionadas? Adicione uma linha de suavização para identificar o formato da distribuição.
+
+**Dicas:**
+
+1.  Os geoms utilizados aqui são: geom_point() para criação do diagrama de dispersão e geom_smooth() para criação da linha de suavização
+2.  Por se tratar de um gráfico de pontos, o valor definido para o eixo X e eixo Y não alteram sua interpretação.
+
+```{r}
+#Respostas aqui
+
+```
+
+### 5.5. Linha
+
+Selecione quatro países do seu continente e faça um gráfico de linhas demostrando a progressão das expectativas de vida de cada país ao longo do período de 1952 a 2007. Além disso, defina que as cores das linhas serão correspondentes aos países.
+
+**Dicas:**
+
+1.  Os anos deverão estar no eixo X.
+2.  O argumento para definir as cores das linhas é o colour(), e deverá estar no argumento de definição dos eixos.
+
+```{r}
+#Respostas aqui
+
+```
