@@ -1,0 +1,361 @@
+---
+title: "Exercícios dplyr e ggplot2 - MQuinho de inverno"
+author: "Rômulo Damasceno"
+date: "6/22/2021"
+output: 
+  html_document:
+    code_folding: hide
+    toc: true
+    toc_depth: 3
+    df_print: paged
+---
+
+```{r}
+knitr::opts_chunk$set(knitr.table.format = "html",
+                      cache =  TRUE, 
+                      echo = TRUE,
+                      warning = FALSE,
+                      message = FALSE)
+```
+
+## Proposta
+
+Para esta lista de exercícios utilizaremos o banco de dados "gapminder", que possui informações demográficas sobre países e continentes, de 1952 a 2007. A ideia é que ao finalizar esta lista, você tenha uma série de objetos e informações interessantes que permitirão a criação do seu primeiro projeto de portfólio!
+
+## Passo 1 - Instalar e carregar os pacotes
+
+1.  Instale o pacote gapminder com a função install.packages()
+
+2.  Com a função library(), carregue os pacotes:
+
+    -   tidyverse
+
+    -   scales
+
+    -   gapminder
+
+3.  Atribua o banco de dados gapminder a um objeto de nome "bd_demog"
+
+```{r}
+# Resposta aqui
+
+#1 
+# install.packages('gapminder')
+
+#2
+library(gapminder)
+library(tidyverse)
+library(scales)
+
+#3 
+bd_demog <- gapminder
+```
+
+## Passo 2 - Estrutura do banco de dados
+
+1.  Utilize a função colnames(), head(), tail() e View() no banco de dados. Pense sobre o que cada uma delas faz.
+2.  Utilizando a função str(), analise a estrutura do banco de dados. As variáveis estão no formato correto?
+3.  Utilize a função summary() no banco de dados e reflita sobre quais das informações podem ser aproveitadas e quais precisam de maior aprofundamento. Faz sentido olhar para a expectativa de vida de todos os países ao mesmo tempo, por exemplo?
+
+```{r}
+#Respostas aqui
+
+#1
+colnames(bd_demog)
+head(bd_demog)
+tail(bd_demog)
+View(bd_demog)
+
+#2
+str(bd_demog)
+
+#3 
+summary(bd_demog)
+
+```
+
+## Passo 3 - Filtragem de um continente para análise
+
+1.  Utilizando a função filter(), do dplyr, escolha um continente para aprofundar sua análise e salve num objeto separado.
+2.  Utilize a função summary() neste novo objeto. As estatísticas básicas mostradas fazem mais sentido agora?
+
+```{r}
+# Respostas aqui
+
+#1 
+americas <- bd_demog %>% 
+  filter(continent == 'Americas')
+
+#2 
+summary(americas)
+
+```
+
+## Passo 4 - Análise descritiva
+
+### 4.1. Média da expectativa de vida por país
+
+Qual é a média da expectativa de vida para cada país no período? Quais os três países que possuem a maior expectativa de vida? Quais três tem as menores? Salve o resultado num objeto separado chamado "seucontinente_lifeExp"
+
+**Dicas:**
+
+1.  Para responder à primeira questão, utilize a função group_by() para a coluna country e então utilize o summarise() com o argumento mean() para calcular as médias agrupadas.
+2.  Utilizando a função arrange(), reordene as expectativas de vida encontradas em ordem decrescente, para responder a segunda parte da questão.
+3.  Salve o resultado desse código num banco chamado "seucontinente_lifeExp"
+
+```{r}
+
+# Respostas aqui
+americas_lifeExp <- americas %>% 
+  group_by(country) %>% 
+  summarise(media_lifeExp = mean(lifeExp)) %>% 
+  arrange(desc(media_lifeExp))
+
+
+americas_lifeExp
+```
+
+### 4.2. Identificar os países com expectativas de vida inferiores e superiores a média dos países.
+
+Crie uma nova coluna no banco seucontinente_lifeExp com um identificador de países que estão acima ou abaixo da média da coluna media_lifeExp.
+
+**Dicas:**
+
+1.  Utilize a função mean() para identificar a média da coluna media_lifeExp
+2.  Utilize as funções mutate() e case_when(), para criar uma nova variável chamada **classificacao_lifeExp**, que tem dois níveis de resposta: "Abaixo da média" e "Acima da média".
+
+```{r}
+#1
+mean(americas_lifeExp$media_lifeExp)
+
+#2
+americas_lifeExp <- americas_lifeExp %>% 
+  mutate(classificacao_lifeExp =
+           case_when(media_lifeExp < mean(media_lifeExp) ~ 'Abaixo da média',
+                     media_lifeExp > mean(media_lifeExp) ~ 'Acima da média'))
+
+americas_lifeExp
+```
+
+## Passo 5 - Visualizações com o ggplot2
+
+### 5.1. Barras
+
+Utilize o vetor que contém as médias de expectativa de vida por país e crie um gráfico de barras.
+
+**Dicas:**
+
+1.  Como as expectativas de vida vão ficar no eixo Y e o geom_bar() não aceita a definição de um eixo Y, utilize o geom_col().
+
+```{r}
+
+americas_lifeExp %>% 
+  ggplot(mapping = aes(x = fct_reorder(country, media_lifeExp),
+                       y = media_lifeExp)) +
+  geom_col() +
+  coord_flip()
+
+
+#Estética
+
+americas_lifeExp %>% 
+  ggplot(mapping = aes(x = fct_reorder(country, media_lifeExp),
+                       y = media_lifeExp)) +
+  geom_col(fill = 'darkcyan') +
+  coord_flip() +
+  scale_y_continuous(limits = c(0,80)) +
+  labs(title = 'Média da expectativa de vida para os países das Américas
+no período de 1952 a 2007',
+       y = 'Média da expectativa de vida',
+       x = 'Países',
+       caption = 'MQuinho de inverno - Meios Jr.') +
+  theme_bw() +
+  theme(plot.title = element_text(face = "bold",                       
+                                  margin = margin(10, 0, 5, 0),
+                                  size = 13),
+        axis.title.x = element_text(margin = margin(t = 10),
+                                    size = 12,
+                                    face = 'italic'),
+        axis.title.y = element_text(margin = margin(r = 10),
+                                    size = 12,
+                                    face = 'italic'),
+        plot.caption = element_text(size = 10))
+```
+
+### 5.2. Histograma
+
+Utilize o vetor do seu continente para criar um histograma de todas as expectativas de vida neste continente.
+
+**Dicas:**
+
+1.  O geom utilizado é o geom_histogram()
+
+```{r}
+
+americas %>% 
+  ggplot(mapping = aes(x = lifeExp)) +
+  geom_histogram()
+
+
+# Estética
+americas %>% 
+  ggplot(mapping = aes(x = lifeExp)) +
+  geom_histogram(colour = 'grey2') +
+  labs(title = 'Distribuição da expectativa de vida países das Américas no 
+período de 1952 a 2007',
+       y = 'Contagem',
+       x = 'Expectativa de vida',
+       caption = 'MQuinho de inverno - Meios Jr.') +
+  theme_bw() +
+  theme(plot.title = element_text(face = "bold",                       
+                                  margin = margin(10, 0, 5, 0),
+                                  size = 13),
+        axis.title.x = element_text(margin = margin(t = 10),
+                                    size = 11,
+                                    face = 'italic'),
+        axis.title.y = element_text(margin = margin(r = 10),
+                                    size = 11,
+                                    face = 'italic'),
+        plot.caption = element_text(size = 10))
+```
+
+### 5.3. Boxplot
+
+Escolha três países para comparar a variável de PIB per capita (gdpPercap) e crie um boxplot que contenha no eixo X os países, no eixo Y a variável gdpPercap e que as cores das caixinhas (fill) sejam pintadas de acordo com o país.
+
+**Dicas:**
+
+1.  O geom utilizado é o geom_boxplot()
+
+```{r}
+
+americas %>% 
+  filter(country %in% c('Brazil', 'United States', 'Canada')) %>% 
+  ggplot(mapping = aes(x = country,
+                       y = gdpPercap,
+                       fill = country)) +
+  geom_boxplot()
+
+# Estética
+americas %>% 
+  filter(country == c('Brazil', 'United States', 'Canada')) %>% 
+  ggplot(mapping = aes(x = country,
+                       y = gdpPercap,
+                       fill = country)) +
+  geom_boxplot() +
+  theme_bw() +
+  scale_fill_brewer(palette = 'Dark2') +
+  labs(title = 'PIB per capita, em US$, para três países das américas para os anos
+de 1952 a 2007', 
+       y = 'PIB per capita',
+       x = '',
+       fill = 'Países',
+       caption = "MQuinho de inverno - Meios Jr.") +
+  theme(plot.title = element_text(face = "bold",
+                                  margin = margin(10, 0, 10, 0),
+                                  size = 12),
+        axis.title.x = element_text(margin = margin(t = 5),
+                                    size = 12,
+                                    face = 'italic'),
+        axis.title.y = element_text(margin = margin(r = 10),
+                                    size = 12,
+                                    face = 'italic'),
+        plot.caption = element_text(size = 11))
+```
+
+### 5.4. Diagrama de dispersão
+
+Crie um gráfico de dispersão entre as variáveis de PIB per capita e expectativa de vida. As variáveis estão correlacionadas? Adicione uma linha de suavização para identificar o formato da distribuição.
+
+**Dicas:**
+
+1.  Os geoms utilizados aqui são: geom_point() para criação do diagrama de dispersão e geom_smooth() para criação da linha de suavização
+2.  Por se tratar de um gráfico de pontos, o valor definido para o eixo X e eixo Y não alteram sua interpretação.
+
+```{r}
+
+americas %>% 
+  ggplot(mapping = aes(x = lifeExp,
+                       y = gdpPercap)) +
+  geom_point() +
+  geom_smooth(method = 'lm') 
+
+# Estética
+
+americas %>% 
+  ggplot(mapping = aes(x = lifeExp,
+                       y = gdpPercap)) +
+  geom_point() +
+  geom_smooth(method = 'lm') +
+  theme_bw() +
+  scale_fill_brewer(palette = 'Dark2') +
+  labs(title = 'Expectativa de vida e PIB per capita dos países das Américas
+no período de 1952 a 2007', 
+       y = 'PIB per capita',
+       x = 'Expectativa de vida',
+       caption = "MQuinho de inverno - Meios Jr.") +
+  theme(plot.title = element_text(face = "bold",
+                                  margin = margin(10, 0, 10, 0),
+                                  size = 12),
+        axis.title.x = element_text(margin = margin(t = 5),
+                                    size = 12,
+                                    face = 'italic'),
+        axis.title.y = element_text(margin = margin(r = 10),
+                                    size = 12,
+                                    face = 'italic'),
+        plot.caption = element_text(size = 11))
+
+
+```
+
+### 5.5. Linha
+
+Selecione quatro países do seu continente e faça um gráfico de linhas demostrando a progressão das expectativas de vida de cada país ao longo do período de 1952 a 2007. Além disso, defina que as cores das linhas serão correspondentes aos países.
+
+**Dicas:**
+
+1.  Os anos deverão estar no eixo X.
+2.  O argumento para definir as cores das linhas é o colour(), e deverá estar no argumento de definição dos eixos.
+
+```{r}
+
+americas %>%
+  mutate(year = as.factor(year)) %>% 
+  filter(country %in% c('Brazil','Canada', 'United States', 'Venezuela')) %>% 
+  ggplot(mapping = aes(x = year,
+                       y = lifeExp,
+                       colour = country,
+                       group = country)) +
+  geom_line()
+
+#Estética
+
+americas %>%
+  mutate(year = as.factor(year)) %>% 
+  filter(country %in% c('Brazil','Canada', 'United States', 'Venezuela')) %>% 
+  ggplot(mapping = aes(x = year,
+                       y = lifeExp,
+                       colour = country,
+                       group = country)) +
+  geom_line() +
+  geom_point() +
+  theme_bw() +
+  scale_colour_brewer(palette = 'Dark2') +
+  labs(title = 'Expectativa de vida para quatro países das Américas
+no período de 1952 a 2007', 
+       y = 'Expectativa de vida',
+       x = 'Anos',
+       caption = "MQuinho de inverno - Meios Jr.",
+       colour = 'País') +
+  theme(plot.title = element_text(face = "bold",
+                                  margin = margin(10, 0, 10, 0),
+                                  size = 12),
+        axis.title.x = element_text(margin = margin(t = 5),
+                                    size = 12,
+                                    face = 'italic'),
+        axis.title.y = element_text(margin = margin(r = 10),
+                                    size = 12,
+                                    face = 'italic'),
+        plot.caption = element_text(size = 11))
+
+```

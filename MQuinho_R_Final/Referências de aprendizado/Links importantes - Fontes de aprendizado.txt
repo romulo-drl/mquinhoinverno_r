@@ -1,0 +1,18 @@
+Cheat sheets dos pacotes:
+https://www.rstudio.com/resources/cheatsheets/
+
+
+R for Data Science
+https://r4ds.had.co.nz/
+
+
+Link do stackoverflow - para tirar dúvidas
+https://pt.stackoverflow.com/
+
+
+Livro de aprofundamento no ggplot2
+https://ggplot2-book.org/
+
+
+Estatística moderna - tidyverse
+https://moderndive.com/
